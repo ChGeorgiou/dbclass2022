@@ -46,13 +46,20 @@ if(isset($_POST["researcher_id"]) && !empty($_POST["researcher_id"])){
         $hired = $input_hired;
     }
     
-    $input_org_id = trim($_POST["organisation_id"]);
-    if(empty($input_org_id)){
-        $org_id_err = "Please enter organisation id.";
-    } else{
-        $org_id = $input_org_id;
-    }
+    //$input_org_id = trim($_POST["organisation_id"]);
+    //if(empty($input_org_id)){
+        //$org_id_err = "Please enter organisation id.";
+    //} else{
+        //$org_id = $input_org_id;
+    //}
     
+    $org_name = trim($_POST["organisation_name"]);
+    $sql = "SELECT organisation_id FROM organisation 
+                    WHERE organisation_name = '$org_name';";
+                    $query11 = mysqli_query($link, $sql);
+                    $result = $query11->fetch_array();
+                    $org_id = intval($result[0]);
+  
     // Check input errors before inserting in database
     if(empty($f_name_err) && empty($l_name_err) && empty($sex_err) && empty($birth_err) && empty($hired_err) && empty($org_id_err)){
         // Prepare an update statement
@@ -118,6 +125,12 @@ if(isset($_POST["researcher_id"]) && !empty($_POST["researcher_id"])){
                 $birth = $row['date_of_birth'];
                 $hired = $row['date_hired'];
                 $org_id = $row['organisation_id'];
+                $sql = "SELECT organisation_name FROM organisation 
+                    WHERE organisation_id = '$org_id';";
+                    $query1 = mysqli_query($link, $sql);
+                    $result = $query1->fetch_array();
+                    $org_name = $result[0];
+                
                 } else{
                     // URL doesn't contain valid id. Redirect to error page
                     header("location: error.php");
@@ -174,24 +187,38 @@ if(isset($_POST["researcher_id"]) && !empty($_POST["researcher_id"])){
                             <span class="invalid-feedback"><?php echo $l_name_err;?></span>
                         </div>
                         <div class="form-group">
-                            <label>Sex</label>
-                            <input type="text" name="sex" class="form-control <?php echo (!empty($sex_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $sex; ?>">
-                            <span class="invalid-feedback"><?php echo $sex_err;?></span>
+                            Sex: 
+                            <select name="sex">
+                                <option selected class="form-control <?php echo (!empty($sex_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $sex; ?>"><?php echo $sex?></option>
+                                <option value="male">male</option>
+                                <option value="female">female</option> 
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Date of birth</label>
-                            <input type="text" name="date_of_birth" class="form-control <?php echo (!empty($birth_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $birth; ?>">
+                            <input type="date" name="date_of_birth" class="form-control <?php echo (!empty($birth_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $birth; ?>">
                             <span class="invalid-feedback"><?php echo $birth_err;?></span>
                         </div>
                         <div class="form-group">
                             <label>Date hired</label>
-                            <input type="text" name="date_hired" class="form-control <?php echo (!empty($hired_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $hired; ?>">
+                            <input type="date" name="date_hired" class="form-control <?php echo (!empty($hired_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $hired; ?>">
                             <span class="invalid-feedback"><?php echo $hired_err;?></span>
                         </div>
-                        <div class="form-group">
-                            <label>Organisation ID</label>
-                            <input type="text" name="organisation_id" class="form-control <?php echo (!empty($org_id_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $org_id; ?>">
-                            <span class="invalid-feedback"><?php echo $org_id_err;?></span>
+                        <div class="form-group"> 
+                            <label>Organisation</label>
+                            <select name="organisation_name">
+                            <option selected class="form-control <?php echo (!empty($org_name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $org_name; ?>"><?php echo $org_name?></option>
+                            <?php
+                                include "config.php";
+                                $sqlr = "SELECT * FROM organisation ORDER BY organisation_name;";
+                                $records = mysqli_query($link, $sqlr);  
+ 
+                                while($row = mysqli_fetch_array($records)) {
+                                    echo "<option value='". $row['organisation_name'] ."'>" .$row['organisation_name'] ."</option>"; 
+                                }	  
+                            ?>  
+                            </select>
+                            <br>
                         </div>
                         <input type="hidden" name="researcher_id" value="<?php echo $id; ?>"/>
                         <input type="submit" class="btn btn-primary" value="Submit">

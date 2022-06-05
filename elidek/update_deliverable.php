@@ -11,12 +11,12 @@ if(isset($_POST["del_id"]) && !empty($_POST["del_id"])){
     // Get hidden input value
     $id = $_POST["del_id"];
     
-    $input_proj_id = trim($_POST["project_id"]);
-    if(empty($input_proj_id)){
-        $proj_id_err = "Please enter project id.";
-    } else{
-        $proj_id = $input_proj_id;
-    }
+    $proj = trim($_POST["project"]);
+    $sql = "SELECT project_id FROM project 
+                    WHERE project_title = '$proj';";
+                    $query11 = mysqli_query($link, $sql);
+                    $result = $query11->fetch_array();
+                    $proj_id = intval($result[0]);
     
     $input_title = trim($_POST["title"]);
     if(empty($input_title)){
@@ -97,6 +97,11 @@ if(isset($_POST["del_id"]) && !empty($_POST["del_id"])){
                     
                    // Retrieve individual field value
                 $proj_id = $row['project_id'];
+                    $sql = "SELECT project_title FROM project 
+                    WHERE project_id = '$proj_id';";
+                    $query1 = mysqli_query($link, $sql);
+                    $result = $query1->fetch_array();
+                    $proj = $result[0];
                 $title = $row['title'];
                 $summary = $row['summary'];
                 $date = $row['delivery_date'];
@@ -145,10 +150,21 @@ if(isset($_POST["del_id"]) && !empty($_POST["del_id"])){
                     <h2 class="mt-5">Update Record</h2>
                     <p>Please edit the input values and submit to update the record.</p>
                     <form action="<?php echo htmlspecialchars(basename($_SERVER['REQUEST_URI'])); ?>" method="post">
-                        <div class="form-group">
-                            <label>Project ID</label>
-                            <input type="text" name="project_id" class="form-control <?php echo (!empty($proj_id_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $proj_id; ?>">
-                            <span class="invalid-feedback"><?php echo $proj_id_err;?></span>
+                        <div class="form-group"> 
+                            <label>Project</label>
+                            <select name="project">
+                            <option selected class="form-control <?php echo (!empty($proj_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $proj; ?>"><?php echo $proj?></option>
+                            <?php
+                                include "config.php";
+                                $sqlr = "SELECT * FROM project ORDER BY project_title;";
+                                $records = mysqli_query($link, $sqlr);  
+ 
+                                while($row = mysqli_fetch_array($records)) {
+                                    echo "<option value='". $row['project_title'] ."'>" .$row['project_title'] ."</option>"; 
+                                }	  
+                            ?>  
+                            </select>
+                            <br>
                         </div>
                         <div class="form-group">
                             <label>Deliverable Title</label>
@@ -162,7 +178,7 @@ if(isset($_POST["del_id"]) && !empty($_POST["del_id"])){
                         </div>
                         <div class="form-group">
                             <label>Delivery Date</label>
-                            <input type="text" name="delivery_date" class="form-control <?php echo (!empty($date_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $date; ?>">
+                            <input type="date" name="delivery_date" class="form-control <?php echo (!empty($date_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $date; ?>">
                             <span class="invalid-feedback"><?php echo $date_err;?></span>
                         </div>
                         <input type="hidden" name="del_id" value="<?php echo $id; ?>"/>

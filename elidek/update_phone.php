@@ -11,12 +11,12 @@ if(isset($_POST["phone_id"]) && !empty($_POST["phone_id"])){
     // Get hidden input value
     $id = $_POST["phone_id"];
     
-    $input_org_id = trim($_POST["organisation_id"]);
-    if(empty($input_org_id)){
-        $org_id_err = "Please enter organisation id.";
-    } else{
-        $org_id = $input_org_id;
-    }
+    $org_name = trim($_POST["organisation_name"]);
+    $sql = "SELECT organisation_id FROM organisation 
+                    WHERE organisation_name = '$org_name';";
+                    $query11 = mysqli_query($link, $sql);
+                    $result = $query11->fetch_array();
+                    $org_id = intval($result[0]);
     
     $input_phone = trim($_POST["phone"]);
     if(empty($input_phone)){
@@ -81,6 +81,11 @@ if(isset($_POST["phone_id"]) && !empty($_POST["phone_id"])){
                     
                    // Retrieve individual field value
                 $org_id = $row['organisation_id'];
+                    $sql = "SELECT organisation_name FROM organisation 
+                    WHERE organisation_id = '$org_id';";
+                    $query1 = mysqli_query($link, $sql);
+                    $result = $query1->fetch_array();
+                    $org_name = $result[0];
                 $phone = $row['phone'];
                 } else{
                     // URL doesn't contain valid id. Redirect to error page
@@ -127,10 +132,21 @@ if(isset($_POST["phone_id"]) && !empty($_POST["phone_id"])){
                     <h2 class="mt-5">Update Record</h2>
                     <p>Please edit the input values and submit to update the record.</p>
                     <form action="<?php echo htmlspecialchars(basename($_SERVER['REQUEST_URI'])); ?>" method="post">
-                        <div class="form-group">
-                            <label>Organisation ID</label>
-                            <input type="text" name="organisation_id" class="form-control <?php echo (!empty($org_id_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $org_id; ?>">
-                            <span class="invalid-feedback"><?php echo $org_id_err;?></span>
+                        <div class="form-group"> 
+                            <label>Organisation</label>
+                            <select name="organisation_name">
+                            <option selected class="form-control <?php echo (!empty($org_name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $org_name; ?>"><?php echo $org_name?></option>
+                            <?php
+                                include "config.php";
+                                $sqlr = "SELECT * FROM organisation ORDER BY organisation_name;";
+                                $records = mysqli_query($link, $sqlr);  
+ 
+                                while($row = mysqli_fetch_array($records)) {
+                                    echo "<option value='". $row['organisation_name'] ."'>" .$row['organisation_name'] ."</option>"; 
+                                }	  
+                            ?>  
+                            </select>
+                            <br>
                         </div>
                         <div class="form-group">
                             <label>Phone Number</label>

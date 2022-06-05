@@ -50,7 +50,7 @@
                                         echo "<th>Funding</th>";
                                         echo "<th>Title</th>";
                                         echo "<th>Description</th>";
-                                        echo "<th>Executor ID</th>";
+                                        echo "<th>Executive ID</th>";
                                         echo "<th>Program ID</th>";
                                         echo "<th>Organisation ID</th>";
                                         echo "<th>Supervisor ID</th>";

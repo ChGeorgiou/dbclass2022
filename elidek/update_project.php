@@ -46,41 +46,44 @@ if(isset($_POST["project_id"]) && !empty($_POST["project_id"])){
         $desc = $input_desc;
     }
     
-    $input_ex_id = trim($_POST["elidek_ex_id"]);
-    if(empty($input_ex_id)){
-        $ex_id_err = "Please enter executor id.";
-    } else{
-        $ex_id = $input_ex_id;
-    }
+    $ex_name = trim($_POST["elidek_ex"]);
+    $full_name = explode(" ", $ex_name);
+    $sql = "SELECT elidek_ex_id FROM elidek_ex 
+                    WHERE first_name = '$full_name[0]' AND last_name = '$full_name[1]';";
+                    $query2 = mysqli_query($link, $sql);
+                    $result = $query2->fetch_array();
+                    $ex_id = intval($result[0]);
     
-    $input_prog_id = trim($_POST["program_id"]);
-    if(empty($input_prog_id)){
-        $prog_id_err = "Please enter program id.";
-    } else{
-        $prog_id = $input_prog_id;
-    }
+    $program = trim($_POST["program"]);
+    $sql = "SELECT program_id FROM program
+                    WHERE title = '$program';";
+                    $query2 = mysqli_query($link, $sql);
+                    $result = $query2->fetch_array();
+                    $prog_id = intval($result[0]);
     
-    $input_org_id = trim($_POST["organisation_id"]);
-    if(empty($input_org_id)){
-        $org_id_err = "Please enter organisation id.";
-    } else{
-        $org_id = $input_org_id;
-    }
+    $org_name = trim($_POST["organisation_name"]);
+    $sql = "SELECT organisation_id FROM organisation
+                    WHERE organisation_name = '$org_name';";
+                    $query2 = mysqli_query($link, $sql);
+                    $result = $query2->fetch_array();
+                    $org_id = intval($result[0]);
     
-    $input_super_id = trim($_POST["supervisor_id"]);
-    if(empty($input_super_id)){
-        $super_id_err = "Please enter supervisor id.";
-    } else{
-        $super_id = $input_super_id;
-    }
+    $super = trim($_POST["supervisor"]);
+    $full_name1 = explode(" ", $super);
+    $sql = "SELECT researcher_id FROM researcher
+                    WHERE first_name = '$full_name1[0]' AND last_name ='$full_name1[1]';";
+                    $query2 = mysqli_query($link, $sql);
+                    $result = $query2->fetch_array();
+                    $super_id = intval($result[0]);
     
-    $input_ev_id = trim($_POST["evaluator_id"]);
-    if(empty($input_ev_id)){
-        $ev_id_err = "Please enter evaluator id.";
-    } else{
-        $ev_id = $input_ev_id;
-    }
-    
+    $ev = trim($_POST["evaluator"]);
+    $full_name2 = explode(" ", $ev);
+    $sql = "SELECT researcher_id FROM researcher
+                    WHERE first_name = '$full_name2[0]' AND last_name ='$full_name2[1]';";
+                    $query2 = mysqli_query($link, $sql);
+                    $result = $query2->fetch_array();
+                    $ev_id = intval($result[0]);
+ 
     $input_grade = trim($_POST["eval_grade"]);
     if(empty($input_grade)){
         $grade_err = "Please enter evaluation grade.";
@@ -166,10 +169,35 @@ if(isset($_POST["project_id"]) && !empty($_POST["project_id"])){
                 $title = $row['project_title'];
                 $desc = $row['project_description'];
                 $ex_id = $row['elidek_ex_id'];
+                $sql = "SELECT first_name, last_name FROM elidek_ex 
+                    WHERE elidek_ex_id = '$ex_id';";
+                    $query1 = mysqli_query($link, $sql);
+                    $result = $query1->fetch_array();
+                    $elidek_ex = $result[0] . " " . $result[1];
                 $prog_id = $row['program_id'];
+                $sql = "SELECT title FROM program 
+                    WHERE program_id = '$prog_id';";
+                    $query1 = mysqli_query($link, $sql);
+                    $result = $query1->fetch_array();
+                    $program = $result[0];
                 $org_id = $row['organisation_id'];
+                    $sql = "SELECT organisation_name FROM organisation 
+                    WHERE organisation_id = '$org_id';";
+                    $query1 = mysqli_query($link, $sql);
+                    $result = $query1->fetch_array();
+                    $org_name = $result[0];
                 $super_id = $row['supervisor_id'];
+                    $sql = "SELECT first_name, last_name FROM researcher 
+                    WHERE researcher_id = '$super_id';";
+                    $query1 = mysqli_query($link, $sql);
+                    $result = $query1->fetch_array();
+                    $super = $result[0] . " " . $result[1];
                 $ev_id = $row['evaluator_id'];
+                    $sql = "SELECT first_name, last_name FROM researcher 
+                    WHERE researcher_id = '$ev_id';";
+                    $query1 = mysqli_query($link, $sql);
+                    $result = $query1->fetch_array();
+                    $ev = $result[0] . " " . $result[1];
                 $grade = $row['eval_grade'];
                 $eval_date = $row['eval_date'];
                 } else{
@@ -219,12 +247,12 @@ if(isset($_POST["project_id"]) && !empty($_POST["project_id"])){
                     <form action="<?php echo htmlspecialchars(basename($_SERVER['REQUEST_URI'])); ?>" method="post">
                         <div class="form-group">
                             <label>Starting Date</label>
-                            <input type="text" name="start_date" class="form-control <?php echo (!empty($s_date_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $s_date; ?>">
+                            <input type="date" name="start_date" class="form-control <?php echo (!empty($s_date_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $s_date; ?>">
                             <span class="invalid-feedback"><?php echo $s_date_err;?></span>
                         </div>
                         <div class="form-group">
                             <label>Ending Date</label>
-                            <input type="text" name="end_date" class="form-control <?php echo (!empty($e_date_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $e_date; ?>">
+                            <input type="date" name="end_date" class="form-control <?php echo (!empty($e_date_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $e_date; ?>">
                             <span class="invalid-feedback"><?php echo $e_date_err;?></span>
                         </div>
                         <div class="form-group">
@@ -242,30 +270,85 @@ if(isset($_POST["project_id"]) && !empty($_POST["project_id"])){
                             <input type="text" name="project_description" class="form-control <?php echo (!empty($desc_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $desc; ?>">
                             <span class="invalid-feedback"><?php echo $desc_err;?></span>
                         </div>
-                        <div class="form-group">
-                            <label>Executive ID</label>
-                            <input type="text" name="elidek_ex_id" class="form-control <?php echo (!empty($ex_id_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $ex_id; ?>">
-                            <span class="invalid-feedback"><?php echo $ex_id_err;?></span>
+                        <div class="form-group"> 
+                            <label>ELIDEK Executive</label>
+                            <select name="elidek_ex">
+                            <option selected class="form-control <?php echo (!empty($elidek_ex_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $elidek_ex; ?>"><?php echo $elidek_ex?></option>
+                            <?php
+                                include "config.php";
+                                $sql = "SELECT * FROM elidek_ex ORDER BY last_name;";
+                                $records = mysqli_query($link, $sql);  
+  
+                                while($row = mysqli_fetch_array($records)) {
+                                    echo "<option value='". $row['first_name']. " ". $row['last_name'] ."'>" .$row['first_name']." ".$row['last_name'] ."</option>"; 
+                                }	  
+                            ?>  
+                            </select>
+                            <br>
                         </div>
-                        <div class="form-group">
-                            <label>Program ID</label>
-                            <input type="text" name="program_id" class="form-control <?php echo (!empty($prog_id_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $prog_id; ?>">
-                            <span class="invalid-feedback"><?php echo $prog_id_err;?></span>
+                        <div class="form-group"> 
+                            <label>Program</label>
+                            <select name="program">
+                            <option selected class="form-control <?php echo (!empty($program_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $program; ?>"><?php echo $program?></option>
+                            <?php
+                                include "config.php";
+                                $sql = "SELECT * FROM program ORDER BY title;";
+                                $records = mysqli_query($link, $sql);  
+  
+                                while($row = mysqli_fetch_array($records)) {
+                                    echo "<option value='". $row['title']."'>" .$row['title']."</option>"; 
+                                }	  
+                            ?>  
+                            </select>
+                            <br>
                         </div>
-                        <div class="form-group">
-                            <label>Organisation ID</label>
-                            <input type="text" name="organisation_id" class="form-control <?php echo (!empty($org_id_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $org_id; ?>">
-                            <span class="invalid-feedback"><?php echo $org_id_err;?></span>
+                        <div class="form-group"> 
+                            <label>Organisation</label>
+                            <select name="organisation_name">
+                            <option selected class="form-control <?php echo (!empty($org_name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $org_name; ?>"><?php echo $org_name?></option>
+                            <?php
+                                include "config.php";
+                                $sqlr = "SELECT * FROM organisation ORDER BY organisation_name;";
+                                $records = mysqli_query($link, $sqlr);  
+ 
+                                while($row = mysqli_fetch_array($records)) {
+                                    echo "<option value='". $row['organisation_name'] ."'>" .$row['organisation_name'] ."</option>"; 
+                                }	  
+                            ?>  
+                            </select>
+                            <br>
                         </div>
-                        <div class="form-group">
-                            <label>Supervisor ID</label>
-                            <input type="text" name="supervisor_id" class="form-control <?php echo (!empty($super_id_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $super_id; ?>">
-                            <span class="invalid-feedback"><?php echo $super_id_err;?></span>
-                        </div>
-                        <div class="form-group">
-                            <label>Evaluator ID</label>
-                            <input type="text" name="evaluator_id" class="form-control <?php echo (!empty($ev_id_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $ev_id; ?>">
-                            <span class="invalid-feedback"><?php echo $ev_id_err;?></span>
+                        <div class="form-group"> 
+                            <label>Supervisor</label>
+                            <select name="supervisor">
+                            <option selected class="form-control <?php echo (!empty($super_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $super; ?>"><?php echo $super?></option>
+                            <?php
+                                include "config.php";
+                                $sql = "SELECT * FROM researcher ORDER BY last_name;";
+                                $records = mysqli_query($link, $sql);  
+  
+                                while($row = mysqli_fetch_array($records)) {
+                                    echo "<option value='". $row['first_name']. " ". $row['last_name'] ."'>" .$row['first_name']." ".$row['last_name'] ."</option>"; 
+                                }	  
+                            ?>
+                            </select>
+                            <br>
+                        </div>    
+                        <div class="form-group"> 
+                            <label>Evaluator</label>
+                            <select name="evaluator">
+                            <option selected class="form-control <?php echo (!empty($ev_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $ev; ?>"><?php echo $ev?></option>
+                            <?php
+                                include "config.php";
+                                $sql = "SELECT * FROM researcher ORDER BY last_name;";
+                                $records = mysqli_query($link, $sql);  
+  
+                                while($row = mysqli_fetch_array($records)) {
+                                    echo "<option value='". $row['first_name']. " ". $row['last_name'] ."'>" .$row['first_name']." ".$row['last_name'] ."</option>"; 
+                                }	  
+                            ?>
+                            </select>
+                            <br>
                         </div>
                         <div class="form-group">
                             <label>Evaluation Grade</label>
@@ -274,7 +357,7 @@ if(isset($_POST["project_id"]) && !empty($_POST["project_id"])){
                         </div>
                         <div class="form-group">
                             <label>Evaluation Date</label>
-                            <input type="text" name="eval_date" class="form-control <?php echo (!empty($eval_date_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $eval_date; ?>">
+                            <input type="date" name="eval_date" class="form-control <?php echo (!empty($eval_date_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $eval_date; ?>">
                             <span class="invalid-feedback"><?php echo $eval_date_err;?></span>
                         </div>
                         <input type="hidden" name="project_id" value="<?php echo $id; ?>"/>
