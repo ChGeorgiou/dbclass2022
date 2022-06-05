@@ -32,12 +32,15 @@
 <h2>Researches aged under 40 that participate in the most projects</h2>
                     </div>
 <?php
-$sql = "WITH max_proj(N, ID) AS (select count(*) AS N, i.researcher_id AS ID
-FROM participates_in i, project p
-WHERE i.project_id = p.project_id
+$sql = "WITH max_proj(N, ID) AS (SELECT count(*) AS N, i.researcher_id AS ID
+FROM participates_in i
+INNER JOIN project p
+ON i.project_id = p.project_id 
 AND p.end_date >= CURDATE()
+INNER JOIN researcher r
+ON r.researcher_id = i.researcher_id AND DATEDIFF(CURDATE(), r.date_of_birth) < 40 * 365.25
 GROUP BY i.researcher_id)
-SELECT r.first_name as f_name, r.last_name as l_name, (SELECT max(N) from max_proj) AS number_of_projects
+SELECT r.first_name, r.last_name, (SELECT max(N) FROM max_proj) AS number_of_projects
 FROM researcher r
 WHERE (DATEDIFF(CURDATE(), r.date_of_birth) < 40*365.25)
 AND (SELECT m.N FROM max_proj m WHERE m.ID = r.researcher_id) = (SELECT max(N) FROM max_proj)";
